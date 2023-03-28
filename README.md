@@ -1,5 +1,11 @@
 # ChatGPTBuddy
-Talk through the terminal, set necessary context, resend chat history and integrate with elevenlabs for voice
+Talk through the terminal, set necessary context, resend chat history and integrate with elevenlabs for voice.
+
+The script keeps the history until the token quota is exceeded, then it removes the oldest messages except initial system prompt message.
+
+The script adds the users timestamp so ChatGPT can use it to have a feel of the flow of time for the user.
+
+The script is kinda ugly but it is how it is, maybe someone still needs something like this so that's why I uploaded it to GitHub.
 
 # Installation
 ```
