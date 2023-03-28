@@ -28,7 +28,7 @@ Reminder that certain symbols need to be escaped in bash with an antislash. Such
 ```
 python3 chat.py I\'m feeling great, had a lot of fun today\!
 ```
-Same with <, > | symbols etc.
+Same with <, >, | symbols etc.
 
 And for easier chatting, you can add the script to your .bash_aliases file and for example add:
 ```
