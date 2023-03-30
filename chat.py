@@ -7,6 +7,7 @@ import requests
 from playsound import playsound
 import json
 from datetime import datetime
+import tiktoken
 
 class Chat:
     # Load your API key from an environment variable or secret management service
@@ -43,18 +44,27 @@ class Chat:
 
             self.give_response()
 
+    def num_tokens_from_messages(self, messages):
+        encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
+        tokens_per_message = 4  # every message follows <|start|>{role/name}\n{content}<|end|>\n
+        tokens_per_name = -1  # if there's a name, the role is omitted
+        num_tokens = 0
+        for message in messages:
+            num_tokens += tokens_per_message
+            for key, value in message.items():
+                num_tokens += len(encoding.encode(value))
+                if key == "name":
+                    num_tokens += tokens_per_name
+        num_tokens += 3  # every reply is primed with <|start|>assistant<|message|>
+        return num_tokens
+
     def give_response(self):
-        try:
-            response = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=self.messages, max_tokens=1024)
-        except:
-            while True:
-                try:
-                    self.messages.pop(1)
-                    self.messages.pop(1)
-                    response = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=self.messages, max_tokens=1024)
-                    break;
-                except:
-                    print("Exceeded tokens, reducing history")
+        while self.num_tokens_from_messages(self.messages) > 4096 - 1024:
+            self.messages.pop(1)
+            self.messages.pop(1)
+            print("Exceeded tokens, reducing history")
+
+        response = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=self.messages, max_tokens=1024)
 
         responseMessage = response['choices'][0]['message']
         self.messages.append({"role": responseMessage["role"], "content": responseMessage["content"]})
