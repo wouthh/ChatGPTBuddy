@@ -9,7 +9,7 @@ The script is kinda ugly but it is how it is, maybe someone still needs somethin
 
 # Installation
 ```
-pip install openai requests playsound
+pip install openai requests playsound tiktoken
 ```
 
 In the script set your API key for openAI, where it says:
