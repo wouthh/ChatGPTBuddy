@@ -9,10 +9,15 @@ import json
 from datetime import datetime
 import tiktoken
 
-class Chat:
-    # Load your API key from an environment variable or secret management service
-    openai.api_key = "YOUR KEY HERE"
 
+def require_environment(name):
+    value = os.environ.get(name)
+    if not value:
+        raise RuntimeError(f"{name} must be provided through the process environment")
+    return value
+
+
+class Chat:
     def __init__(self):
         # Concatenate the arguments
         query = ' '.join(sys.argv[1:])
@@ -59,6 +64,8 @@ class Chat:
         return num_tokens
 
     def give_response(self):
+        openai.api_key = require_environment("OPENAI_API_KEY")
+
         while self.num_tokens_from_messages(self.messages) > 4096 - 1024:
             self.messages.pop(1)
             self.messages.pop(1)
@@ -78,10 +85,11 @@ class Chat:
             return 0
 
         # Set URL, headers and payload for the API request
-        url = "https://api.elevenlabs.io/v1/text-to-speech/VOICE_ID"
+        voice_id = require_environment("ELEVENLABS_VOICE_ID")
+        url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
         headers = {
             "accept": "audio/mpeg",
-            "xi-api-key": "your elevenlabs api key goes here",
+            "xi-api-key": require_environment("ELEVENLABS_API_KEY"),
             "Content-Type": "application/json"
         }
         tts = responseMessage['content'][10:]
