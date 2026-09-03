@@ -65,6 +65,11 @@ class Chat:
 
     def give_response(self):
         openai.api_key = require_environment("OPENAI_API_KEY")
+        voice_id = None
+        elevenlabs_api_key = None
+        if self.enable_voice:
+            voice_id = require_environment("ELEVENLABS_VOICE_ID")
+            elevenlabs_api_key = require_environment("ELEVENLABS_API_KEY")
 
         while self.num_tokens_from_messages(self.messages) > 4096 - 1024:
             self.messages.pop(1)
@@ -85,11 +90,10 @@ class Chat:
             return 0
 
         # Set URL, headers and payload for the API request
-        voice_id = require_environment("ELEVENLABS_VOICE_ID")
         url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
         headers = {
             "accept": "audio/mpeg",
-            "xi-api-key": require_environment("ELEVENLABS_API_KEY"),
+            "xi-api-key": elevenlabs_api_key,
             "Content-Type": "application/json"
         }
         tts = responseMessage['content'][10:]
